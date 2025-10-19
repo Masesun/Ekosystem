@@ -1,0 +1,191 @@
+#include <iostream>
+#include <SFML/Graphics.hpp>
+
+using namespace std;
+using namespace sf;
+
+#define maxMainMenu 3
+
+class MainMenu {
+public: 
+	MainMenu(float width, float height)
+	{
+		if (!font.loadFromFile("Czcionki/OpenSans.ttf"))
+			cout << "Nie zaladowalo czcionki" << endl;
+
+		menu[0].setFont(font);
+		menu[0].setFillColor(Color::White);
+		menu[0].setString("Rozpocznij");
+		menu[0].setCharacterSize(40);
+		menu[0].setPosition(200, 200);
+
+		menu[1].setFont(font);
+		menu[1].setFillColor(Color::White);
+		menu[1].setString("Parametry Symulacji");
+		menu[1].setCharacterSize(40);
+		menu[1].setPosition(200, 300);
+
+		menu[2].setFont(font);
+		menu[2].setFillColor(Color::White);
+		menu[2].setString("Autorzy");
+		menu[2].setCharacterSize(40);
+		menu[2].setPosition(200, 400);
+
+		mainMenuSelected = -1;
+	}
+	void draw(RenderWindow& window)
+	{
+		for (int i = 0; i < maxMainMenu; i++)
+			window.draw(menu[i]);
+	}
+	void moveUp()
+	{
+		if (mainMenuSelected - 1 >= 0)
+		{
+			menu[mainMenuSelected].setFillColor(Color::White);
+			mainMenuSelected--;
+			if (mainMenuSelected == -1)
+				mainMenuSelected == 2;
+		}
+		menu[mainMenuSelected].setFillColor(Color::Blue);
+
+	}
+	void moveDown()
+	{
+		if (mainMenuSelected + 1 <= maxMainMenu)
+		{
+			menu[mainMenuSelected].setFillColor(Color::White);
+			mainMenuSelected++;
+			if (mainMenuSelected == 4)
+				mainMenuSelected == 0;
+		}
+		menu[mainMenuSelected].setFillColor(Color::Blue);
+
+	}
+
+	int mainMenuPressed() {
+		return mainMenuSelected;
+	}
+	~MainMenu() {}
+
+private:
+	int mainMenuSelected;
+	Font font;
+	Text menu[maxMainMenu];
+};
+
+int main()
+{
+	RenderWindow MENU(VideoMode(960, 720), "Main Menu", Style::Default);
+	MainMenu mainMenu(MENU.getSize().x, MENU.getSize().y);
+
+	while (MENU.isOpen())
+	{
+		Event event;
+		while (MENU.pollEvent(event))
+		{
+			if (event.type == Event::Closed)
+				MENU.close();
+			if (event.type == Event::KeyReleased)
+			{
+				if (event.key.code == Keyboard::Up)
+				{
+					mainMenu.moveUp();
+					break;
+				}
+				if (event.key.code == Keyboard::Down)
+				{
+					mainMenu.moveDown();
+					break;
+				}
+				if (event.key.code == Keyboard::Return)
+				{
+					RenderWindow Play(VideoMode(960, 720), "game_name");
+					RenderWindow Parametry(VideoMode(960, 720), "Parametry symulacji");
+					RenderWindow Autorzy(VideoMode(960, 720), "Autorzy");
+
+					int x = mainMenu.mainMenuPressed();
+					if (x == 0)
+					{
+						while (Play.isOpen())
+						{
+							Event event1;
+							while (Play.pollEvent(event1))
+							{
+								if (event1.type == Event::Closed)
+									Play.close();
+								if (event1.type == Event::KeyPressed)
+								{
+									if (event1.type == Keyboard::Escape)
+									{
+										Play.close();
+									}
+								}
+									
+							}
+							Parametry.close();
+							Autorzy.close();
+							Play.clear();
+							Play.display();
+						}
+					}
+					
+					if (x == 1)
+					{
+						while (Parametry.isOpen())
+						{
+							Event event2;
+							while (Parametry.pollEvent(event2))
+							{
+								if (event2.type == Event::Closed)
+									Parametry.close();
+								if (event2.type == Event::KeyPressed)
+								{
+									if (event2.type == Keyboard::Escape)
+									{
+										Parametry.close();
+									}
+								}
+
+							}
+							Play.close();
+							Parametry.clear();
+							Autorzy.close();
+							Parametry.display();
+						}
+					}
+
+					if (x == 2)
+					{
+						while (Autorzy.isOpen())
+						{
+							Event event3;
+							while (Autorzy.pollEvent(event3))
+							{
+								if (event3.type == Event::Closed)
+									Autorzy.close();
+								if (event3.type == Event::KeyPressed)
+								{
+									if (event3.type == Keyboard::Escape)
+									{
+										Autorzy.close();
+									}
+								}
+
+							}
+							Play.close();
+							Parametry.clear();
+
+							Autorzy.clear();
+							Autorzy.display();
+						}
+					}
+				}
+			}
+		}
+		MENU.clear();
+		mainMenu.draw(MENU);
+		MENU.display();
+	}
+	return 0;
+}
